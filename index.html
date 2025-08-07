@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技能描述</title>
+    <style>
+        body { 
+            font-family: "Microsoft YaHei", sans-serif;
+            padding: 10px; 
+            background-color: #f0f0f0; 
+        }
+        .group { 
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .index-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .index-item {
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .index-item:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        h2 {
+            color: #2c3e50;
+            margin: 0 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div id="groups"></div>
+
+    <script>
+        // 示例文件列表（请替换为实际文件名）
+        const imageList = [
+            "Blue 传教士.jpg", "Blue 圣女.jpg", "Blue 圣庭检查士.jpg", "Blue 圣弓.jpg", "Blue 圣枪骑士.jpg", "Blue 圣殿骑士.jpg", "Blue 女武神.jpg", "Blue 守护天使.jpg", "Blue 怠惰少女.jpg", "Blue 月之女神.jpg", "Blue 神官.jpg", "Blue 红衣主教.jpg", "Green 兽灵武士.jpg", "Green 剑之魔女.jpg", "Green 剑帝.jpg", "Green 女仆长.jpg", "Green 暗杀者.jpg", "Green 格斗家.jpg", "Green 游击士.jpg", "Green 猎巫人.jpg", "Green 神箭手.jpg", "Green 精灵射手.jpg", "Green 风之剑圣.jpg", "Purple 冒险家.jpg", "Purple 吟游诗人.jpg", "Purple 封印师.jpg", "Purple 异教徒.jpg", "Purple 捣蛋萝莉.jpg", "Purple 灵熙之潮.jpg", "Purple 灵魂术士.jpg", "Purple 瘟疫法师.jpg", "Purple 结界师.jpg", "Purple 记录者.jpg", "Purple 阴阳师.jpg", "Purple 魔剑士.jpg", "Purple 魔弓.jpg", "Purple 魔枪.jpg", "Red 仲裁者.jpg", "Red  勇者.jpg", "Red 噬神者.jpg", "Red 染污者.jpg", "Red 狂战士.jpg", "Red 红莲骑士.jpg", "Red 苍炎魔女.jpg", "Red 萝莉狂战.jpg", "Red 血之巫女.jpg", "Red 血色剑灵.jpg", "Yellow 元素学徒.jpg", "Yellow  元素师.jpg", "Yellow 咒符师.jpg", "Yellow 战斗法师.jpg", "Yellow 星坠女巫.jpg", "Yellow 暴食少女.jpg", "Yellow 灵符师.jpg", "Yellow 矜贵之女.jpg", "Yellow 祈祷师.jpg", "Yellow 神秘学者.jpg", "Yellow 英灵人形.jpg", "Yellow 蝶舞者.jpg", "Yellow 贤者.jpg", "Yellow 贪婪少女.jpg", "Yellow 魔法少女.jpg",
+        ];
+
+        // 智能解析文件名
+        function parseFileName(filename) {
+            const match = filename.match(/^(Blue|Green|Red|Yellow|Purple)\s+([\u4e00-\u9fa5\u3000-\u303F\w\s]+?)\./i);
+            return match ? { 
+                color: match[1], 
+                name: match[2].trim(),
+                fullName: filename
+            } : null;
+        }
+
+        // 按颜色分组并排序
+        function groupByColor(images) {
+            const colorGroups = {};
+            
+            images.forEach(filename => {
+                const parsed = parseFileName(filename);
+                if (parsed) {
+                    const color = parsed.color;
+                    if (!colorGroups[color]) {
+                        colorGroups[color] = [];
+                    }
+                    colorGroups[color].push(parsed);
+                }
+            });
+
+            // 按中文名称排序
+            Object.values(colorGroups).forEach(group => {
+                group.sort((a, b) => 
+                    a.name.localeCompare(b.name, 'zh-Hans-CN')
+                );
+            });
+
+            return colorGroups;
+        }
+
+        // 创建界面
+        function renderGroups(colorGroups) {
+            const container = document.getElementById('groups');
+            const colorOrder = ["Blue", "Green", "Red", "Yellow", "Purple"];
+
+            colorOrder.forEach(color => {
+                if (!colorGroups[color]) return;
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'group';
+                
+                const title = document.createElement('h2');
+                title.innerHTML = `${color}（${colorGroups[color].length}项）`;
+                
+                const indexList = document.createElement('div');
+                indexList.className = 'index-list';
+                
+                colorGroups[color].forEach(item => {
+                    const indexItem = document.createElement('div');
+                    indexItem.className = 'index-item';
+                    indexItem.textContent = item.name;
+                    indexItem.title = item.fullName;
+                    indexItem.onclick = () => window.open('images/' + item.fullName, '_blank');
+                    indexList.appendChild(indexItem);
+                });
+
+                groupDiv.appendChild(title);
+                groupDiv.appendChild(indexList);
+                container.appendChild(groupDiv);
+            });
+        }
+
+        // 初始化
+        const colorGroups = groupByColor(imageList);
+        renderGroups(colorGroups);
+    </script>
+</body>
+</html>
