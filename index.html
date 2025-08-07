@@ -65,7 +65,28 @@
                 fullName: filename
             } : null;
         }
-
+        const GROUP_CONFIG = {
+            Blue: {
+                displayName: "神圣教廷",
+                color: "#2196F3" // 可选颜色配置
+            },
+            Green: {
+                displayName: "战技殿堂",
+                color: "#4CAF50"
+            },
+            Red: {
+                displayName: "鲜血议会",
+                color: "#F44336"
+            },
+            Yellow: {
+                displayName: "咏歌城",
+                color: "#FF8000"
+            },
+            Purple: {
+                displayName: "幻影联盟",
+                color: "#9C27B0"
+            }
+        };
         // 按颜色分组并排序
         function groupByColor(images) {
             const colorGroups = {};
@@ -96,23 +117,28 @@
             const container = document.getElementById('groups');
             const colorOrder = ["Blue", "Green", "Red", "Yellow", "Purple"];
 
-            colorOrder.forEach(color => {
-                if (!colorGroups[color]) return;
+            colorOrder.forEach(colorKey => {
+                if (!colorGroups[colorKey]) return;
 
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'group';
                 
                 const title = document.createElement('h2');
-                title.innerHTML = `${color}（${colorGroups[color].length}项）`;
+                title.innerHTML = `
+                    <span style="color: ${GROUP_CONFIG[colorKey].color}">■</span>
+                    ${GROUP_CONFIG[colorKey].displayName} 
+                    <small>(${colorGroups[colorKey].length}项)</small>
+                `;
                 
                 const indexList = document.createElement('div');
                 indexList.className = 'index-list';
                 
-                colorGroups[color].forEach(item => {
+                colorGroups[colorKey].forEach(item => {
                     const indexItem = document.createElement('div');
                     indexItem.className = 'index-item';
                     indexItem.textContent = item.name;
                     indexItem.title = item.fullName;
+                    indexItem.style.backgroundColor = GROUP_CONFIG[colorKey].color + "CC"; // 添加透明度
                     indexItem.onclick = () => window.open('images/' + item.fullName, '_blank');
                     indexList.appendChild(indexItem);
                 });
@@ -122,7 +148,6 @@
                 container.appendChild(groupDiv);
             });
         }
-
         // 初始化
         const colorGroups = groupByColor(imageList);
         renderGroups(colorGroups);
