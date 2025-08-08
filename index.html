@@ -198,11 +198,10 @@
                 groupDiv.className = 'group';
                 
                 const title = document.createElement('h2');
-                // title.innerHTML = `${colorKey}（${Object.keys(colorGroups[colorKey]).length}组）`;
                 title.innerHTML = `
                     <span style="color: ${GROUP_CONFIG[colorKey].color}">■</span>
                     ${GROUP_CONFIG[colorKey].displayName} 
-                    <small>（${Object.keys(colorGroups[colorKey]).length}组）</small>
+                    <small>（${Object.keys(colorGroups[colorKey]).length}项）</small>
                 `;
                 
                 const indexList = document.createElement('div');
@@ -218,6 +217,13 @@
                     indexItem.onclick = () => {
                         showMultiView(baseName, items);
                     };
+                    // indexItem.onclick = () => {
+                    //     if (items.length > 1) {
+                    //         showMultiView(baseName, items);
+                    //     } else {
+                    //         window.open('images/'+items[0].fullName, '_blank');
+                    //     }
+                    // };
                     
                     indexList.appendChild(indexItem);
                 });
@@ -262,7 +268,8 @@
 
         // 初始化
         const imageList = [
-"Blue 传教士.jpg", "Blue 传教士_2.jpg", "Blue 原初之弓.jpg", "Blue 原初之弓_2.jpg", "Blue 原初之弓_3.jpg", "Blue 圣女.jpg", "Blue 圣庭检查士.jpg", "Blue 圣庭检查士_2.jpg", "Blue 圣弓.jpg", "Blue 圣弓_2.jpg", "Blue 圣枪骑士.jpg", "Blue 圣殿骑士.jpg", "Blue 女武神.jpg", "Blue 守护天使.jpg", "Blue 怠惰少女.jpg", "Blue 月之女神.jpg", "Blue 神官.jpg", "Blue 红衣主教.jpg", "Green 兽灵武士.jpg", "Green 剑之魔女.jpg", "Green 剑帝.jpg", "Green 女仆长.jpg", "Green 女仆长_2.jpg", "Green 暗杀者.jpg", "Green 格斗家.jpg", "Green 游击士.jpg", "Green 猎巫人.jpg", "Green 神箭手.jpg", "Green 精灵射手.jpg", "Green 风之剑圣.jpg", "Purple 冒险家.jpg", "Purple 吟游诗人.jpg", "Purple 吟游诗人_2.jpg", "Purple 封印师.jpg", "Purple 封印师_2.jpg", "Purple 异教徒.jpg", "Purple 异教徒_3.jpg", "Purple 异教 徒_4.jpg", "Purple 捣蛋萝莉.jpg", "Purple 灵熙之潮.jpg", "Purple 灵魂术士.jpg", "Purple 灵魂术士_2.jpg", "Purple 瘟疫法师.jpg", "Purple 结界师.jpg", "Purple 结界师_2.jpg", "Purple 记录者.jpg", "Purple 记录者_2.jpg", "Purple 记录者_3.jpg", "Purple 阴阳师.jpg", "Purple 魔剑士.jpg", "Purple 魔弓.jpg", "Purple 魔枪.jpg", "Putple 异教徒_2.jpg", "Red 仲裁者.jpg", "Red 勇者.jpg", "Red 勇者_2.jpg", "Red 原初主教_2.jpg", "Red 噬神者.jpg", "Red 噬神者_2.jpg", "Red 噬神者_3.jpg", "Red 染污者.jpg", "Red 狂战士.jpg", "Red 红莲骑士.jpg", "Red 苍炎魔女.jpg", "Red 萝莉狂战.jpg", "Red 血之巫女.jpg", "Red 血之巫女_2.jpg", "Red 血色剑灵.jpg", "Red 血色剑灵_2.jpg", "Yellow 元素学徒.jpg", "Yellow 元素师.jpg", "Yellow 咒符师.jpg", "Yellow 战斗法师.jpg", "Yellow 星坠女巫.jpg", "Yellow 星坠女巫_2.jpg", "Yellow 星坠女巫_3.jpg", "Yellow 星坠女巫_4.jpg", "Yellow 暴食少女.jpg", "Yellow 灵符师.jpg", "Yellow 矜贵之女.jpg", "Yellow 祈祷师.jpg", "Yellow 神秘学者.jpg", "Yellow 英灵人形.jpg", "Yellow 英 灵人形_2.jpg", "Yellow 英灵人形_3.jpg", "Yellow 蝶舞者.jpg", "Yellow 贤者.jpg", "Yellow 贪婪少女.jpg", "Yellow 魔法少女.jpg",        ];
+"Blue 传教士.jpg", "Blue 传教士_2.jpg", "Blue 原初之弓.jpg", "Blue 原初之弓_2.jpg", "Blue 原初之弓_3.jpg", "Blue 圣女.jpg", "Blue 圣庭检查士.jpg", "Blue 圣庭检查士_2.jpg", "Blue 圣弓.jpg", "Blue 圣弓_2.jpg", "Blue 圣枪骑士.jpg", "Blue 圣殿骑士.jpg", "Blue 女武神.jpg", "Blue 守护天使.jpg", "Blue 怠惰少女.jpg", "Blue 月之女神.jpg", "Blue 神官.jpg", "Blue 红衣主教.jpg", "Blue 红衣主教_2.jpg", "Blue 红衣主教_3.jpg", "Blue 红衣主教_4.jpg", "Blue 红衣主教_5.jpg", "Green 兽灵武士.jpg", "Green 剑之魔女.jpg", "Green 剑帝.jpg", "Green 女仆长.jpg", "Green 女仆长_2.jpg", "Green 暗杀者.jpg", "Green 格斗家.jpg", "Green 游击士.jpg", "Green 猎巫人.jpg", "Green 神箭手.jpg", "Green 精灵射手.jpg", "Green 风之剑圣.jpg", "Purple 冒险家.jpg", "Purple 吟游诗人.jpg", "Purple 吟游诗人_2.jpg", "Purple  封印师.jpg", "Purple 封印师_2.jpg", "Purple 异教徒.jpg", "Purple 异教徒_3.jpg", "Purple 异教徒_4.jpg", "Purple 捣蛋萝莉.jpg", "Purple 灵熙之潮.jpg", "Purple 灵魂术士.jpg", "Purple 灵魂术士_2.jpg", "Purple 瘟疫法师.jpg", "Purple 结界师.jpg", "Purple 结界师_2.jpg", "Purple 记录者.jpg", "Purple 记录者_2.jpg", "Purple 记录者_3.jpg", "Purple 阴阳师.jpg", "Purple 魔剑士.jpg", "Purple 魔弓.jpg", "Purple 魔枪.jpg", "Purple 异教徒_2.jpg", "Red 仲裁者.jpg", "Red 勇者.jpg", "Red 勇者_2.jpg", "Red 噬神者.jpg", "Red 噬神者_2.jpg", "Red 噬神者_3.jpg", "Red 染污者.jpg", "Red 狂战士.jpg", "Red 红莲骑士.jpg", "Red 苍炎魔女.jpg", "Red 萝莉狂战.jpg", "Red 血之巫女.jpg", "Red 血之巫女_2.jpg", "Red 血色剑灵.jpg", "Red 血色剑灵_2.jpg", "Yellow 元素学徒.jpg", "Yellow 元素师.jpg", "Yellow 咒符师.jpg", "Yellow 战斗法师.jpg", "Yellow 星坠女巫.jpg", "Yellow 星坠女巫_2.jpg", "Yellow 星坠女巫_3.jpg", "Yellow 星坠女巫_4.jpg", "Yellow 暴食少女.jpg", "Yellow 灵符师.jpg", "Yellow 矜贵之女.jpg", "Yellow 祈祷师.jpg", "Yellow 神秘学者.jpg", "Yellow 英灵人形.jpg", "Yellow 英灵人形_2.jpg", "Yellow 英灵人形_3.jpg", "Yellow 蝶舞者.jpg", "Yellow 贤者.jpg", "Yellow 贪婪少女.jpg", "Yellow 魔法少女.jpg",
+        ];
         
         const colorGroups = groupByColor(imageList);
         renderGroups(colorGroups);
