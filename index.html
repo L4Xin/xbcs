@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>技能描述</title>
+    <title>多图分组浏览器</title>
     <style>
-        body { 
+                body { 
             font-family: "Microsoft YaHei", sans-serif;
             padding: 10px; 
             background-color: #f0f0f0; 
@@ -45,26 +45,69 @@
             padding-bottom: 8px;
             border-bottom: 2px solid #eee;
         }
+
+        /* 新增多图模式样式 */
+        .multi-image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: flex;
+            flex-direction:column;
+            overflow: hidden; /* 禁止全局滚动 */
+        }
+
+        .multi-image-container {
+            background: white;
+            padding: 20px 0;
+            border-radius: 10px;
+            max-width: 90%;
+            flex: 1; /* 占据剩余空间 */
+            overflow-y: auto; /* 允许垂直滚动 */
+        }
+
+        .multi-image-grid {
+            /* display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); */
+            display: flex;
+            flex-direction:column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .multi-image-item {
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .multi-image-item:hover {
+            border-color: #4CAF50;
+        }
     </style>
 </head>
 <body>
+    <!-- 原有结构保持不变 -->
     <div id="groups"></div>
 
-    <script>
-        // 示例文件列表（请替换为实际文件名）
-        const imageList = [
-            "Blue 传教士.jpg", "Blue 圣女.jpg", "Blue 圣庭检查士.jpg", "Blue 圣弓.jpg", "Blue 圣枪骑士.jpg", "Blue 圣殿骑士.jpg", "Blue 女武神.jpg", "Blue 守护天使.jpg", "Blue 怠惰少女.jpg", "Blue 月之女神.jpg", "Blue 神官.jpg", "Blue 红衣主教.jpg", "Green 兽灵武士.jpg", "Green 剑之魔女.jpg", "Green 剑帝.jpg", "Green 女仆长.jpg", "Green 暗杀者.jpg", "Green 格斗家.jpg", "Green 游击士.jpg", "Green 猎巫人.jpg", "Green 神箭手.jpg", "Green 精灵射手.jpg", "Green 风之剑圣.jpg", "Purple 冒险家.jpg", "Purple 吟游诗人.jpg", "Purple 封印师.jpg", "Purple 异教徒.jpg", "Purple 捣蛋萝莉.jpg", "Purple 灵熙之潮.jpg", "Purple 灵魂术士.jpg", "Purple 瘟疫法师.jpg", "Purple 结界师.jpg", "Purple 记录者.jpg", "Purple 阴阳师.jpg", "Purple 魔剑士.jpg", "Purple 魔弓.jpg", "Purple 魔枪.jpg", "Red 仲裁者.jpg", "Red  勇者.jpg", "Red 噬神者.jpg", "Red 染污者.jpg", "Red 狂战士.jpg", "Red 红莲骑士.jpg", "Red 苍炎魔女.jpg", "Red 萝莉狂战.jpg", "Red 血之巫女.jpg", "Red 血色剑灵.jpg", "Yellow 元素学徒.jpg", "Yellow  元素师.jpg", "Yellow 咒符师.jpg", "Yellow 战斗法师.jpg", "Yellow 星坠女巫.jpg", "Yellow 暴食少女.jpg", "Yellow 灵符师.jpg", "Yellow 矜贵之女.jpg", "Yellow 祈祷师.jpg", "Yellow 神秘学者.jpg", "Yellow 英灵人形.jpg", "Yellow 蝶舞者.jpg", "Yellow 贤者.jpg", "Yellow 贪婪少女.jpg", "Yellow 魔法少女.jpg",
-        ];
+    <!-- 新增多图模态框 -->
+    <div class="multi-image-modal" id="multiImageModal">
+        <div class="multi-image-container">
+            <h3 id="multiImageTitle" style="color: #333; margin:0 0 15px 0;"></h3>
+            <div class="multi-image-grid" id="multiImageGrid"></div>
+            <button onclick="closeMultiView()" style="margin-top:15px; padding:8px 20px; background:#666; color:white; border:none; border-radius:4px;">
+                关闭
+            </button>
+        </div>
+    </div>
 
-        // 智能解析文件名
-        function parseFileName(filename) {
-            const match = filename.match(/^(Blue|Green|Red|Yellow|Purple)\s+([\u4e00-\u9fa5\u3000-\u303F\w\s]+?)\./i);
-            return match ? { 
-                color: match[1], 
-                name: match[2].trim(),
-                fullName: filename
-            } : null;
-        }
+    <script>
         const GROUP_CONFIG = {
             Blue: {
                 displayName: "神圣教廷",
@@ -87,32 +130,42 @@
                 color: "#9C27B0"
             }
         };
-        // 按颜色分组并排序
+
+        // 改进版文件名解析
+        function parseFileName(filename) {
+            const pattern = /^(Blue|Green|Red|Yellow|Purple)\s+([\u4e00-\u9fa5]+?)(?:\(\d+\)|_\d+)?\./i;
+            const match = filename.match(pattern);
+            return match ? {
+                color: match[1],
+                baseName: match[2], // 基础名称
+                fullName: filename
+            } : null;
+        }
+
+        // 改进分组逻辑
         function groupByColor(images) {
             const colorGroups = {};
-            
+
             images.forEach(filename => {
                 const parsed = parseFileName(filename);
                 if (parsed) {
                     const color = parsed.color;
                     if (!colorGroups[color]) {
-                        colorGroups[color] = [];
+                        colorGroups[color] = {};
                     }
-                    colorGroups[color].push(parsed);
+                    
+                    // 按基础名称二次分组
+                    if (!colorGroups[color][parsed.baseName]) {
+                        colorGroups[color][parsed.baseName] = [];
+                    }
+                    colorGroups[color][parsed.baseName].push(parsed);
                 }
-            });
-
-            // 按中文名称排序
-            Object.values(colorGroups).forEach(group => {
-                group.sort((a, b) => 
-                    a.name.localeCompare(b.name, 'zh-Hans-CN')
-                );
             });
 
             return colorGroups;
         }
 
-        // 创建界面
+        // 修改渲染逻辑
         function renderGroups(colorGroups) {
             const container = document.getElementById('groups');
             const colorOrder = ["Blue", "Green", "Red", "Yellow", "Purple"];
@@ -124,22 +177,27 @@
                 groupDiv.className = 'group';
                 
                 const title = document.createElement('h2');
+                // title.innerHTML = `${colorKey}（${Object.keys(colorGroups[colorKey]).length}组）`;
                 title.innerHTML = `
                     <span style="color: ${GROUP_CONFIG[colorKey].color}">■</span>
                     ${GROUP_CONFIG[colorKey].displayName} 
-                    <small>(${colorGroups[colorKey].length}项)</small>
+                    <small>（${Object.keys(colorGroups[colorKey]).length}组）</small>
                 `;
                 
                 const indexList = document.createElement('div');
                 indexList.className = 'index-list';
                 
-                colorGroups[colorKey].forEach(item => {
+                Object.entries(colorGroups[colorKey]).forEach(([baseName, items]) => {
                     const indexItem = document.createElement('div');
                     indexItem.className = 'index-item';
-                    indexItem.textContent = item.name;
-                    indexItem.title = item.fullName;
+                    indexItem.textContent = baseName;
+                    indexItem.title = baseName;
                     indexItem.style.backgroundColor = GROUP_CONFIG[colorKey].color + "CC"; // 添加透明度
-                    indexItem.onclick = () => window.open('images/' + item.fullName, '_blank');
+
+                    indexItem.onclick = () => {
+                        showMultiView(baseName, items);
+                    };
+                    
                     indexList.appendChild(indexItem);
                 });
 
@@ -148,7 +206,38 @@
                 container.appendChild(groupDiv);
             });
         }
+
+        // 新增多图查看功能
+        function showMultiView(baseName, items) {
+            const modal = document.getElementById('multiImageModal');
+            const grid = document.getElementById('multiImageGrid');
+            const title = document.getElementById('multiImageTitle');
+            
+            title.textContent = `${baseName}（共${items.length}张）`;
+            grid.innerHTML = '';
+            
+            items.forEach(item => {
+                const imgItem = document.createElement('img');
+                imgItem.src = 'images/'+item.fullName;
+                imgItem.style.width = '100%';
+                imgItem.style.borderRadius = '6px';
+                imgItem.onclick = () => window.open('images/'+item.fullName, '_blank');
+                grid.appendChild(imgItem);
+            });
+
+            modal.style.display = 'flex';
+            toggleDirectory(false);
+        }
+
+        function closeMultiView() {
+            document.getElementById('multiImageModal').style.display = 'none';
+            toggleDirectory(true);
+        }
+
         // 初始化
+        const imageList = [
+"Blue 传教士.jpg", "Blue 传教士_2.jpg", "Blue 原初之弓.jpg", "Blue 原初之弓_2.jpg", "Blue 原初之弓_3.jpg", "Blue 圣女.jpg", "Blue 圣庭检查士.jpg", "Blue 圣庭检查士_2.jpg", "Blue 圣弓.jpg", "Blue 圣弓_2.jpg", "Blue 圣枪骑士.jpg", "Blue 圣殿骑士.jpg", "Blue 女武神.jpg", "Blue 守护天使.jpg", "Blue 怠惰少女.jpg", "Blue 月之女神.jpg", "Blue 神官.jpg", "Blue 红衣主教.jpg", "Green 兽灵武士.jpg", "Green 剑之魔女.jpg", "Green 剑帝.jpg", "Green 女仆长.jpg", "Green 女仆长_2.jpg", "Green 暗杀者.jpg", "Green 格斗家.jpg", "Green 游击士.jpg", "Green 猎巫人.jpg", "Green 神箭手.jpg", "Green 精灵射手.jpg", "Green 风之剑圣.jpg", "Purple 冒险家.jpg", "Purple 吟游诗人.jpg", "Purple 吟游诗人_2.jpg", "Purple 封印师.jpg", "Purple 封印师_2.jpg", "Purple 异教徒.jpg", "Purple 异教徒_3.jpg", "Purple 异教 徒_4.jpg", "Purple 捣蛋萝莉.jpg", "Purple 灵熙之潮.jpg", "Purple 灵魂术士.jpg", "Purple 灵魂术士_2.jpg", "Purple 瘟疫法师.jpg", "Purple 结界师.jpg", "Purple 结界师_2.jpg", "Purple 记录者.jpg", "Purple 记录者_2.jpg", "Purple 记录者_3.jpg", "Purple 阴阳师.jpg", "Purple 魔剑士.jpg", "Purple 魔弓.jpg", "Purple 魔枪.jpg", "Putple 异教徒_2.jpg", "Red 仲裁者.jpg", "Red 勇者.jpg", "Red 勇者_2.jpg", "Red 原初主教_2.jpg", "Red 噬神者.jpg", "Red 噬神者_2.jpg", "Red 噬神者_3.jpg", "Red 染污者.jpg", "Red 狂战士.jpg", "Red 红莲骑士.jpg", "Red 苍炎魔女.jpg", "Red 萝莉狂战.jpg", "Red 血之巫女.jpg", "Red 血之巫女_2.jpg", "Red 血色剑灵.jpg", "Red 血色剑灵_2.jpg", "Yellow 元素学徒.jpg", "Yellow 元素师.jpg", "Yellow 咒符师.jpg", "Yellow 战斗法师.jpg", "Yellow 星坠女巫.jpg", "Yellow 星坠女巫_2.jpg", "Yellow 星坠女巫_3.jpg", "Yellow 星坠女巫_4.jpg", "Yellow 暴食少女.jpg", "Yellow 灵符师.jpg", "Yellow 矜贵之女.jpg", "Yellow 祈祷师.jpg", "Yellow 神秘学者.jpg", "Yellow 英灵人形.jpg", "Yellow 英 灵人形_2.jpg", "Yellow 英灵人形_3.jpg", "Yellow 蝶舞者.jpg", "Yellow 贤者.jpg", "Yellow 贪婪少女.jpg", "Yellow 魔法少女.jpg",        ];
+        
         const colorGroups = groupByColor(imageList);
         renderGroups(colorGroups);
     </script>
