@@ -149,6 +149,9 @@
             }
         };
 
+        // 历史状态管理
+        let modalHistoryState = null;
+
         // 改进版文件名解析
         function parseFileName(filename) {
             const pattern = /^(Blue|Green|Red|Yellow|Purple)\s+([\u4e00-\u9fa5]+?)(?:\(\d+\)|_\d+)?\./i;
@@ -243,11 +246,18 @@
                 grid.appendChild(imgItem);
             });
 
+            history.pushState({ modalOpen: true }, '');
+
             modal.style.display = 'flex';
         }
 
         function closeMultiView() {
             document.getElementById('multiImageModal').style.display = 'none';
+
+            // 回退历史记录
+            if (modalHistoryState) {
+                history.back();
+            }
         }
 
         // 初始化
@@ -263,6 +273,12 @@
             if (modal.style.display === 'flex') {
                 modal.style.display = 'none';
             }
+        });
+
+        // 防止重复添加历史记录
+        let lastModalState = null;
+        window.addEventListener('load', () => {
+            history.replaceState({ modalOpen: false }, '');
         });
     </script>
 </body>
