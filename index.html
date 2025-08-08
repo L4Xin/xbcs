@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>多图分组浏览器</title>
     <style>
-                body { 
+        body { 
             font-family: "Microsoft YaHei", sans-serif;
             padding: 10px; 
             background-color: #f0f0f0; 
@@ -58,7 +58,6 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            display: flex;
             flex-direction:column;
             overflow: hidden; /* 禁止全局滚动 */
         }
@@ -90,6 +89,25 @@
         .multi-image-item:hover {
             border-color: #4CAF50;
         }
+
+        /* 浮动关闭按钮 */
+        .float-close {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 50%;
+
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
     </style>
 </head>
 <body>
@@ -101,8 +119,8 @@
         <div class="multi-image-container">
             <h3 id="multiImageTitle" style="color: #333; margin:0 0 15px 0;"></h3>
             <div class="multi-image-grid" id="multiImageGrid"></div>
-            <button onclick="closeMultiView()" style="margin-top:15px; padding:8px 20px; background:#666; color:white; border:none; border-radius:4px;">
-                关闭
+            <button class="float-close" onclick="closeMultiView()">
+                返回
             </button>
         </div>
     </div>
@@ -226,12 +244,10 @@
             });
 
             modal.style.display = 'flex';
-            toggleDirectory(false);
         }
 
         function closeMultiView() {
             document.getElementById('multiImageModal').style.display = 'none';
-            toggleDirectory(true);
         }
 
         // 初始化
@@ -240,6 +256,14 @@
         
         const colorGroups = groupByColor(imageList);
         renderGroups(colorGroups);
+
+        // 监听返回操作
+        window.addEventListener('popstate', (event) => {
+            const modal = document.getElementById('multiImageModal');
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
